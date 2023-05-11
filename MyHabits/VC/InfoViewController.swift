@@ -64,8 +64,7 @@ class InfoViewController: UIViewController {
         addSubviews()
         setupContraints()
     }
-    
-    //MARK: - Action
+        
     //MARK: - Functions
     
     func addSubviews() {
@@ -99,13 +98,13 @@ class InfoViewController: UIViewController {
 //            headerText
             headerText.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             headerText.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-//            headerText.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 10),
-//            headerText.bottomAnchor.constraint(equalTo: textInfo.bottomAnchor, constant: 10),
+            headerText.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
 
+//            textInfo
             textInfo.topAnchor.constraint(equalTo: headerText.bottomAnchor, constant: 20),
             textInfo.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            textInfo.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: 10),
-            textInfo.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 10),
+            textInfo.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            textInfo.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
             ])
     }
 }
