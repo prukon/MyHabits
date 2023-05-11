@@ -15,6 +15,7 @@
 		1A55D65F2A0C3E9D0064643C /* HabitsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A55D65E2A0C3E9D0064643C /* HabitsStore.swift */; };
 		1A55D6612A0C3ED50064643C /* HabitsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A55D6602A0C3ED50064643C /* HabitsViewController.swift */; };
 		1A55D6632A0C3EE00064643C /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A55D6622A0C3EE00064643C /* InfoViewController.swift */; };
+		1A55D6662A0D83190064643C /* HabitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A55D6652A0D83190064643C /* HabitViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		1A55D65E2A0C3E9D0064643C /* HabitsStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HabitsStore.swift; sourceTree = "<group>"; };
 		1A55D6602A0C3ED50064643C /* HabitsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitsViewController.swift; sourceTree = "<group>"; };
 		1A55D6622A0C3EE00064643C /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
+		1A55D6652A0D83190064643C /* HabitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				1A55D6602A0C3ED50064643C /* HabitsViewController.swift */,
+				1A55D6652A0D83190064643C /* HabitViewController.swift */,
 				1A55D6622A0C3EE00064643C /* InfoViewController.swift */,
 			);
 			path = VC;
@@ -153,6 +156,7 @@
 			files = (
 				1A55D65F2A0C3E9D0064643C /* HabitsStore.swift in Sources */,
 				1A55D64F2A0C3D460064643C /* ViewController.swift in Sources */,
+				1A55D6662A0D83190064643C /* HabitViewController.swift in Sources */,
 				1A55D64B2A0C3D460064643C /* AppDelegate.swift in Sources */,
 				1A55D6612A0C3ED50064643C /* HabitsViewController.swift in Sources */,
 				1A55D6632A0C3EE00064643C /* InfoViewController.swift in Sources */,

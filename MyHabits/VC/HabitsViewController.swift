@@ -347,7 +347,24 @@ class HabitsViewController: UIViewController {
     //MARK: - Action
     
     @objc func tapBarButton() {
-        print(1)
+        let habitViewController = HabitViewController()
+        //Модальный переход
+// navigationController?.present(habitViewController,animated: true)
+        
+        let backButton = UIBarButtonItem()
+        backButton.title = "Назад"
+        navigationItem.backBarButtonItem = backButton
+        
+        navigationController?.pushViewController(habitViewController, animated: true)
+
+        
+        
+//        let modalViewController = HabitViewController()
+//        let navigationController = UINavigationController(rootViewController: modalViewController)
+//
+//        navigationController.modalPresentationStyle = .fullScreen
+//        present(navigationController, animated: true, completion: nil)
+
     }
     
     //MARK: - Constraints
