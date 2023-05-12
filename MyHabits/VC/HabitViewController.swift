@@ -7,10 +7,11 @@
 
 import UIKit
 
-class HabitViewController: UIViewController {
+class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate {
     
     //MARK: - Property
     
+    var selectedDate = Date()
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -28,9 +29,8 @@ class HabitViewController: UIViewController {
         let button = UIBarButtonItem()
         button.style = .plain
         button.title = "Сохранить"
-//        button.image = UIImage(systemName: "plus")
         button.target = self
-//        button.action = #selector(tapBarButton)
+        button.action = #selector(tapSaveButton)
         return button
     }()
     
@@ -75,6 +75,7 @@ class HabitViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setBackgroundImage(UIImage(systemName: "circle.fill"), for: .normal)
         button.tintColor = .blue
+        button.addTarget(self, action: #selector(tapColorButton), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -106,16 +107,16 @@ class HabitViewController: UIViewController {
         return label
     }()
     
-    private var datePicker: UIDatePicker = {
+    private lazy var datePicker: UIDatePicker = {
         var datePicker = UIDatePicker()
         datePicker.datePickerMode = .time
         datePicker.preferredDatePickerStyle = .wheels
         datePicker.isEnabled = true
+        datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
+
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         return datePicker
     }()
-    
-    
     
     //MARK: - LifeCycle
     
@@ -124,12 +125,6 @@ class HabitViewController: UIViewController {
         title = "Создать"
         view.backgroundColor = .white
         navigationItem.rightBarButtonItem = saveButton
-//        navigationItem.leftBarButtonItem = cancelButton
-//        navigationItem.titleView?.backgroundColor = .cyan
-
-//        let backButton = UIBarButtonItem(title: "Назад", style: .plain, target: self, action: #selector(backButtonTapped))
-//        navigationItem.leftBarButtonItem = backButton
-
     
         addSubviews()
         setupContraints()
@@ -152,10 +147,39 @@ class HabitViewController: UIViewController {
         contentView.addSubview(focusTimeLabel)
         contentView.addSubview(targetTimeLabel)
         contentView.addSubview(datePicker)
-
-
     }
     
+    // Метод делегата для обработки выбранного цвета
+     func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
+         colorButton.tintColor = viewController.selectedColor
+     }
+    
+    //MARK: - Action
+    @objc func tapColorButton() {
+        let colorPicker = UIColorPickerViewController()
+        colorPicker.selectedColor = colorButton.tintColor
+           colorPicker.delegate = self
+           present(colorPicker, animated: true, completion: nil)
+    }
+    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
+         selectedDate = sender.date
+           // Вы можете использовать выбранное значение даты здесь
+           // Например, можно вывести его в консоль
+           print(selectedDate)
+    }
+//    let enteredText = textField.text
+
+    
+    @objc func tapSaveButton() {
+        let newHabit = Habit(name: textField.text ?? " ",
+                             date: selectedDate,
+                             color: colorButton.tintColor)
+        let store = HabitsStore.shared
+        store.habits.append(newHabit)
+        
+        self.navigationController?.popViewController(animated: true)
+
+    }
     
     //MARK: - Constraints
     
@@ -214,7 +238,9 @@ class HabitViewController: UIViewController {
 //            datePicker
             datePicker.topAnchor.constraint(equalTo: focusTimeLabel.bottomAnchor),
             datePicker.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-     
+            datePicker.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            
+
         ])
     }
     
