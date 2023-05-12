@@ -1,21 +1,21 @@
+////
+////  ViewController.swift
+////  MyHabits
+////
+////  Created by Evgeniy Ustyan on 10.05.2023.
+////
 //
-//  ViewController.swift
-//  MyHabits
+//import UIKit
 //
-//  Created by Evgeniy Ustyan on 10.05.2023.
+//class ViewController: UIViewController {
 //
-
-import UIKit
-
-class ViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .green
-
-        // Do any additional setup after loading the view.
-    }
-
-
-}
-
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        view.backgroundColor = .green
+//
+//        // Do any additional setup after loading the view.
+//    }
+//
+//
+//}
+//

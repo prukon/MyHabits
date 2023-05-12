@@ -142,14 +142,10 @@ extension HabitsViewController: UICollectionViewDataSource {
     @objc  func editButtonTapped() -> Void {
         print("Hello Edit Button")
     }
-    @objc  func buttonClicked(sender : UIButton ){
-        print("---")
-        print(sender.tag)
-        print(store.habits[sender.tag].isAlreadyTakenToday)
-        
+    @objc  func buttonClicked(sender : UIButton ){        
         if !store.habits[sender.tag].isAlreadyTakenToday {
             sender.setBackgroundImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
-            
+//            HabitsStore.shared.track()
             
             //Как мне здесь вызвать метод HabitsStore.shared.track() для затрекивания привычки?
             
