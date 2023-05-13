@@ -11,6 +11,7 @@ class HabitsViewController: UIViewController {
     
     //MARK: - Properties
     
+    
     let store = HabitsStore.shared
     
     private lazy var collectionView: UICollectionView = {
@@ -129,10 +130,10 @@ extension HabitsViewController: UICollectionViewDataSource {
             cell.setupCell(habit: store.habits[indexPath.row])
             
             cell.waterButton.tag = indexPath.row
-            cell.waterButton.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
+//            cell.waterButton.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
             
             
-            
+//            self.collectionView.reloadData()
             return cell
         }
     }
@@ -142,17 +143,17 @@ extension HabitsViewController: UICollectionViewDataSource {
     @objc  func editButtonTapped() -> Void {
         print("Hello Edit Button")
     }
-    @objc  func buttonClicked(sender : UIButton ){        
-        if !store.habits[sender.tag].isAlreadyTakenToday {
-            sender.setBackgroundImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
-//            HabitsStore.shared.track()
-            
-            //Как мне здесь вызвать метод HabitsStore.shared.track() для затрекивания привычки?
-            
-            //Пробовал передать Habits параметры метода buttonClicked, но методы @objc не принимают два параметра.
-
-        }
-    }
+//    @objc  func buttonClicked(sender : UIButton ){
+//        if !store.habits[sender.tag].isAlreadyTakenToday {
+//            sender.setBackgroundImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
+////            HabitsStore.shared.track()
+//
+//            //Как мне здесь вызвать метод HabitsStore.shared.track() для затрекивания привычки?
+//
+//            //Пробовал передать Habits параметры метода buttonClicked, но методы @objc не принимают два параметра.
+//
+//        }
+//    }
     
 }
 

@@ -11,6 +11,7 @@ class HabitCollectionViewCell: UICollectionViewCell {
  
     //MARK: - Property
 
+    
     //MARK: Water
         private let waterView: UIView = {
             let view = UIView()
@@ -19,7 +20,10 @@ class HabitCollectionViewCell: UICollectionViewCell {
             view.backgroundColor = .white
             return view
         }()
-        
+    var isAlreadyTakenCurrent = Bool()
+    
+    private var habit: Habit!
+    
         private let waterHeaderLabel: UILabel = {
             let label = UILabel()
             label.font = UIFont(name: "SFProText-Regular", size: 17)
@@ -53,6 +57,8 @@ class HabitCollectionViewCell: UICollectionViewCell {
         
          lazy var  waterButton: UIButton = {
             let button = UIButton(type: .system)
+             button.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
+             
             button.translatesAutoresizingMaskIntoConstraints = false
             return button
         }()
@@ -86,7 +92,8 @@ class HabitCollectionViewCell: UICollectionViewCell {
     }
     
     func setupCell(habit: Habit) {
-//
+        self.habit = habit
+
             waterHeaderLabel.text = habit.name
             waterHeaderLabel.textColor = habit.color
             waterRegularLabel.text = habit.dateString
@@ -98,9 +105,20 @@ class HabitCollectionViewCell: UICollectionViewCell {
                 waterButton.setBackgroundImage(UIImage(systemName: "circle"), for: .normal)
             }
         
-        
-        
+        func buttonClicked(sender : UIButton ){
+         print(3)
+        }
     }
+    
+    //MARK: Action
+    
+    @objc  func buttonClicked(sender : UIButton ){
+        if !habit.isAlreadyTakenToday {
+            waterButton.setBackgroundImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
+            HabitsStore.shared.track(habit)
+        }
+    }
+    
     //MARK: - Constraints
     
     private func setupContraints() {
