@@ -11,9 +11,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        
         
         guard let _ = (scene as? UIWindowScene) else { return }
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -27,8 +25,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         novigationHabitsController.tabBarItem.title = "Привычки"
         novigationHabitsController.tabBarItem.image = UIImage(systemName: "person.circle.fill")
         
-
-        
         //Создаем объект feedViewController
         let infoViewController = InfoViewController()
         let novigationInfoController = UINavigationController(rootViewController: infoViewController)
@@ -41,16 +37,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        tabViewController.tabBar.backgroundColor = UIColor.systemFill
         tabViewController.tabBar.tintColor = UIColor.systemBlue
         
-        
-        
         //Устанавливаем NovigationViewController как rootController
         window.rootViewController =  tabViewController
         
         //Устанавливаем ранее созданное window как главное windows и делаем его видимым
         self.window = window
         window.makeKeyAndVisible()
-        
-        
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -80,7 +72,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
-
-
 }
 

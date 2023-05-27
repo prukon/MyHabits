@@ -11,8 +11,8 @@ class HabitsViewController: UIViewController {
     
     //MARK: - Properties
     
-    
     let store = HabitsStore.shared
+    let progressCollectionViewCell = ProgressCollectionViewCell()
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -29,7 +29,6 @@ class HabitsViewController: UIViewController {
         collectionView.register(
             HabitCollectionViewCell.self, forCellWithReuseIdentifier: HabitCollectionViewCell.identifier)
         
-        
         collectionView.delegate = self
         collectionView.backgroundColor = .systemGray6
         return collectionView
@@ -38,22 +37,10 @@ class HabitsViewController: UIViewController {
     lazy var barButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
         button.style = .plain
-        button.title = "Button"
         button.image = UIImage(systemName: "plus")
         button.target = self
         button.action = #selector(tapBarButton)
         return button
-    }()
-    
-    private let titleLabel: UILabel = {
-        var label = UILabel()
-        
-        label.font = UIFont(name: "SFProText-Regular", size: 20)
-        label.font = UIFont.systemFont(ofSize: 34)
-        label.text = "Сегодня"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textAlignment = .left
-        return label
     }()
     
     //MARK: LifeCycle
@@ -61,23 +48,42 @@ class HabitsViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         navigationItem.rightBarButtonItem = barButton
-        navigationItem.titleView = titleLabel
         addSubviews()
         setupContraints()
+        setupNavController()
+//        addTwoHabbit()
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        collectionView.reloadData()
     }
     
     //MARK: - Functions
     func addSubviews() {
         view.addSubview(collectionView)
-        
+    }
+    
+    @objc func reloadCollectionView() {
+        collectionView.reloadData()
+    }
+    
+    func setupNavController() {
+        self.navigationItem.title = "Сегодня"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+    }
+    
+    private func addTwoHabbit(){
+        store.habits.removeAll()
+        store.habits.append(Habit(name: "Погладь кота", date: Date(), color: .red))
+        store.habits.append(Habit(name: "Сходить в магазин", date: Date(), color: .purple))
     }
     
     //MARK: - Action
     
     @objc func tapBarButton() {
         let habitViewController = HabitViewController()
-        
         let backButton = UIBarButtonItem()
         backButton.title = "Назад"
         navigationItem.backBarButtonItem = backButton
@@ -88,21 +94,16 @@ class HabitsViewController: UIViewController {
     
     func setupContraints() {
         let safeAreaGuide = view.safeAreaLayoutGuide
-        
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: safeAreaGuide.topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            
-            
         ])
     }
-    
 }
 
 extension HabitsViewController: UICollectionViewDataSource {
-    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         2
     }
@@ -114,7 +115,6 @@ extension HabitsViewController: UICollectionViewDataSource {
             return 1
         } else {
             return store.habits.count
-            
         }
     }
     
@@ -123,38 +123,34 @@ extension HabitsViewController: UICollectionViewDataSource {
         
         if  indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProgressCollectionViewCell.identifier, for: indexPath) as! ProgressCollectionViewCell
+            cell.setProgress(with: store.todayProgress)
             return cell
         }
         else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HabitCollectionViewCell.identifier, for: indexPath) as! HabitCollectionViewCell
-            cell.setupCell(habit: store.habits[indexPath.row])
             
-            cell.waterButton.tag = indexPath.row
-//            cell.waterButton.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
-            
-            
-//            self.collectionView.reloadData()
+            cell.setupCell(habit: store.habits[indexPath.item]){
+                self.collectionView.reloadData()
+            }
+            cell.onStateBtnClick = {
+                self.collectionView.reloadData()
+            }
+            cell.editHabit = {
+                let detailVC = HabitDetailsViewController()
+                detailVC.habit = self.store.habits[indexPath.item]
+                detailVC.numberOfHabit = indexPath.item
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            }
             return cell
         }
     }
     
-    
-    
-    @objc  func editButtonTapped() -> Void {
-        print("Hello Edit Button")
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ProgressCollectionViewCell.identifier, for: indexPath) as! ProgressCollectionViewCell
+        
+        header.setProgress(with: store.todayProgress)
+        return header
     }
-//    @objc  func buttonClicked(sender : UIButton ){
-//        if !store.habits[sender.tag].isAlreadyTakenToday {
-//            sender.setBackgroundImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
-////            HabitsStore.shared.track()
-//
-//            //Как мне здесь вызвать метод HabitsStore.shared.track() для затрекивания привычки?
-//
-//            //Пробовал передать Habits параметры метода buttonClicked, но методы @objc не принимают два параметра.
-//
-//        }
-//    }
-    
 }
 
 // MARK: UICollectionViewDelegateFlowLayout
@@ -164,16 +160,11 @@ extension HabitsViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if indexPath.section == 0 {
             let width = (collectionView.bounds.width)
-            //                let height = (collectionView.bounds.height)
-            
             return CGSize(width: width, height: 100)
         } else {
             let width = (collectionView.bounds.width)
-            //                let height = (collectionView.bounds.height)
-            
             return CGSize(width: width, height: 160)
         }
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -188,5 +179,3 @@ extension HabitsViewController: UICollectionViewDelegateFlowLayout {
         inset
     }
 }
-
-

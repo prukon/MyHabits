@@ -1,5 +1,8 @@
 import UIKit
 
+let store = HabitsStore.shared
+
+
 /// Класс для хранения данных о привычке.
 public final class Habit: Codable {
     

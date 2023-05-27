@@ -9,9 +9,35 @@ import UIKit
 
 class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate {
     
-    //MARK: - Property
+    enum TypeOpen {
+    case add
+    case edit
+    }
     
+    //MARK: - Property
+    var type: TypeOpen = .add
+
+    let store = HabitsStore.shared
     var selectedDate = Date()
+    var habit: Habit!
+    var numberOfHabit = Int()
+    var habitCollectionViewCell = HabitCollectionViewCell()
+    var habitsViewController = HabitsViewController()
+    
+    lazy var delButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Удалить", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(delHabit), for: .touchUpInside)
+        button.backgroundColor = .red
+        button.tintColor = .white
+        button.layer.borderColor = UIColor.red.cgColor
+        button.layer.borderWidth = 1
+        button.layer.cornerRadius = 5
+        button.alpha = 0
+        return button
+    }()
+    
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -25,25 +51,6 @@ class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate
         return view
     }()
     
-    lazy var saveButton: UIBarButtonItem = {
-        let button = UIBarButtonItem()
-        button.style = .plain
-        button.title = "Сохранить"
-        button.target = self
-        button.action = #selector(tapSaveButton)
-        return button
-    }()
-    
-    lazy var cancelButton: UIBarButtonItem = {
-        let button = UIBarButtonItem()
-        button.style = .plain
-        button.title = "Отменить"
-//        button.image = UIImage(systemName: "plus")
-        button.target = self
-//        button.action = #selector(tapBarButton)
-        return button
-    }()
-    
     private let nameLabel: UILabel = {
         var label = UILabel()
         label.font = UIFont(name: "SFProText-Regular", size: 20)
@@ -53,12 +60,14 @@ class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate
         return label
     }()
     
-    private let textField: UITextField = {
+    private lazy var textField: UITextField = {
         var textField = UITextField()
         textField.placeholder = "Бегать по утрам, спать 8 часов и т.п."
         textField.font = UIFont(name: "SFProText-Regular", size: 17)
         textField.font = UIFont.systemFont(ofSize: 17)
         textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.addTarget(self, action: #selector(textFieldShouldReturn), for: .editingDidEndOnExit)
+        
         return textField
     }()
     
@@ -103,6 +112,7 @@ class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate
         label.font = UIFont(name: "SFProText-Regular", size: 20)
         label.font = UIFont.systemFont(ofSize: 13)
         label.text = "11:00 PM"
+        label.textColor = .blue
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -113,7 +123,6 @@ class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate
         datePicker.preferredDatePickerStyle = .wheels
         datePicker.isEnabled = true
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
-
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         return datePicker
     }()
@@ -122,16 +131,12 @@ class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Создать"
         view.backgroundColor = .white
-        navigationItem.rightBarButtonItem = saveButton
-    
+        
         addSubviews()
         setupContraints()
-    }
-    
-    @objc func backButtonTapped () {
-        
+        setupNC()
+        addValues()
     }
     
     //MARK: - Functions
@@ -147,38 +152,107 @@ class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate
         contentView.addSubview(focusTimeLabel)
         contentView.addSubview(targetTimeLabel)
         contentView.addSubview(datePicker)
+        contentView.addSubview(delButton)
     }
     
     // Метод делегата для обработки выбранного цвета
-     func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
-         colorButton.tintColor = viewController.selectedColor
-     }
+    func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
+        colorButton.tintColor = viewController.selectedColor
+    }
+    
+    private lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.timeStyle = .short
+        return formatter
+    }()
+    
+    func addValues() {
+        
+        if type == .edit {
+            textField.text = habit.name
+            colorButton.tintColor = habit.color
+            let dateString = dateFormatter.string(from: habit.date)
+            targetTimeLabel.text = dateString
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Сохранить", style: .plain, target: self, action: #selector(tapSaveButton))
+            delButton.alpha = 1
+            title = "Изменить"
+        }
+    }
+    
+    func setupNC() {
+        self.navigationItem.largeTitleDisplayMode = .never
+        self.navigationItem.hidesBackButton = true
+        
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Отменить", style: .plain, target: self, action: #selector(goBack))
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Сохранить", style: .plain, target: self, action: #selector(tapSaveButton))
+               title = "Создать"
+    }
     
     //MARK: - Action
+    
     @objc func tapColorButton() {
         let colorPicker = UIColorPickerViewController()
         colorPicker.selectedColor = colorButton.tintColor
-           colorPicker.delegate = self
-           present(colorPicker, animated: true, completion: nil)
+        colorPicker.delegate = self
+        present(colorPicker, animated: true, completion: nil)
     }
+    
     @objc func datePickerValueChanged(_ sender: UIDatePicker) {
-         selectedDate = sender.date
-           // Вы можете использовать выбранное значение даты здесь
-           // Например, можно вывести его в консоль
-           print(selectedDate)
+        selectedDate = sender.date
+        
+        targetTimeLabel.text = dateToString(date: sender.date)
     }
-//    let enteredText = textField.text
-
     
     @objc func tapSaveButton() {
-        let newHabit = Habit(name: textField.text ?? " ",
-                             date: selectedDate,
-                             color: colorButton.tintColor)
-        let store = HabitsStore.shared
-        store.habits.append(newHabit)
-        
-        self.navigationController?.popViewController(animated: true)
+        if type == .add {
+            if !textField.text!.isEmpty{
+                habit = Habit(name: textField.text ?? " ",
+                              date: selectedDate,
+                              color: colorButton.tintColor)
+                let store = HabitsStore.shared
+                store.habits.append(habit)
+                habitsViewController.progressCollectionViewCell.setProgress(with: HabitsStore.shared.todayProgress)
+                habitsViewController.reloadCollectionView()
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                textField.shake()
+                return
+            }
+        }
+        else if type == .edit {
+            store.habits[numberOfHabit].name = textField.text ?? " "
+            store.habits[numberOfHabit].color = colorButton.tintColor
+            store.habits[numberOfHabit].date = selectedDate
 
+            self.navigationController?.popToRootViewController(animated: true)
+        }
+    }
+    
+    @objc func delHabit() {
+        showAlert(title: "Удаление привычки", message: "Вы точно хотите удалить привычку?")
+    }
+    
+    @objc private func textFieldShouldReturn() -> Bool {
+        return view.endEditing(true)
+    }
+    
+    @objc func goBack() {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Да", style: .default) {_ in
+            self.store.habits.remove(at: self.numberOfHabit)
+            self.navigationController?.popToRootViewController(animated: true)
+        }
+        let cancelAction = UIAlertAction(title: "Отмена", style: .default) {_ in
+        }
+        alert.addAction(okAction)
+        alert.addAction(cancelAction)
+        present(alert, animated: true)
     }
     
     //MARK: - Constraints
@@ -213,15 +287,12 @@ class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate
             colorLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 15),
             colorLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15),
             
-            
             //            colorButton
             colorButton.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 15),
             colorButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15),
             colorButton.widthAnchor.constraint(equalToConstant: 30),
             colorButton.heightAnchor.constraint(equalToConstant: 30),
-
             
-
             //            timeLabel
             timeLabel.topAnchor.constraint(equalTo: colorButton.bottomAnchor, constant: 15),
             timeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15),
@@ -235,14 +306,15 @@ class HabitViewController: UIViewController, UIColorPickerViewControllerDelegate
             targetTimeLabel.topAnchor.constraint(equalTo: focusTimeLabel.topAnchor),
             targetTimeLabel.leadingAnchor.constraint(equalTo: focusTimeLabel.trailingAnchor, constant: 0),
             
-//            datePicker
+            //            datePicker
             datePicker.topAnchor.constraint(equalTo: focusTimeLabel.bottomAnchor),
             datePicker.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            datePicker.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
             
-
+            //            delButton
+            delButton.topAnchor.constraint(equalTo: datePicker.bottomAnchor, constant: 20),
+            delButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            delButton.widthAnchor.constraint(equalToConstant: 300),
+            delButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
         ])
     }
-    
-    
 }
